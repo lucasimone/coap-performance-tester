@@ -117,7 +117,8 @@ def extract_field(pkt, what) -> str:
             return pkt["_source"]['layers']['ipv6']['ipv6.addr']
         elif what == 'coap.mid':
             return pkt["_source"]['layers']['coap']['coap.mid']
-
+        elif what == 'coap.type':
+            return pkt["_source"]['layers']['coap']['coap.type']
         else:
             raise Exception("{0} is not a valid parameter".format(what))
     except:
@@ -130,17 +131,21 @@ def computeTime(json_file) -> (float, int):
         pkts = json.load(file)
         file.close()
 
+    count_ack = 0
     mids = dict()
     wrong_pkts = 0
     for pkt in pkts:
         frame_id = extract_field(pkt, 'frame_id')
         if 'coap' in  pkt["_source"]['layers']:
-
+            con_type  = int(extract_field(pkt, 'coap.type'))
             time = extract_field(pkt, 'time_delta_displayed')
             mid  = extract_field(pkt, 'coap.mid')
             if mid not in mids.keys():
                 mids[mid] = []
             mids[mid].append(float(time))
+
+            if con_type == 2 :
+               con_type += 1
         else:
             wrong_pkts += 1
             logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
@@ -156,11 +161,11 @@ def computeTime(json_file) -> (float, int):
     except:
         logger.error("Unable to read the packets")
 
-
+    p_success = (con_type/NUM_TEST) * 100
     avarage = sum(con_time)/len(con_time)
     logger.info ("Avarage time: %f" % avarage)
     n_cons = len(pkts) - wrong_pkts
     expeted_cons = NUM_TEST *2 # with ACK
     pdr = (n_cons - expeted_cons)/expeted_cons * 100
-    return (avarage, pdr, e2e)
+    return (avarage, pdr, e2e, p_success)
 

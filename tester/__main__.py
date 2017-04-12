@@ -53,13 +53,20 @@ if __name__ == '__main__':
                 start_coap_client(to=timeout_variance, arf=rand_factor_variance*ARF_STEP, ret=retry_variance)
                 stop_sniffer()
                 decode_json(file_name)
-                avg_time, pdr, e2e = computeTime('%s.json'%file_id)
+                avg_time, pdr, e2e, p_success= computeTime('%s.json'%file_id)
                 with open(TEST_RESULT, "a") as fw:
-                    fw.writelines(
-                        "TEST.{0} TO:{1} ARF:{2} RT:{3} ITERATION:{4} AVG_TIME:{5} PDR:{6} E2E:{7}\n"
-                            .format(index, timeout_variance, rand_factor_variance * ARF_STEP,
-                            retry_variance, NUM_TEST, avg_time, pdr, e2e))
+                    line = []
+                    line.append("TEST.{0}".format(index))
+                    line.append("TO:{0}".format(timeout_variance))
+                    line.append("ARF:{0}".format(rand_factor_variance* ARF_STEP))
+                    line.append("RT:{0}".format(retry_variance))
+                    line.append("ITERATION:{0}".format(NUM_TEST))
+                    line.append("AVG_TIME:{0}".format(avg_time))
+                    line.append("PDR:{0}".format(pdr))
+                    line.append("E2E:{0}".format(e2e))
+                    line.append("P_SUCCESS:{0}".format(p_success))
+                    line.append("\n")
+                    fw.writelines(" ".join(line))
                     fw.close()
-
-                index+=1
+                index += 1
     logger.debug("TEST is over!")
