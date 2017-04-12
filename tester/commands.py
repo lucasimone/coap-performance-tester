@@ -131,20 +131,36 @@ def computeTime(json_file) -> (float, int):
         file.close()
 
     mids = dict()
+    wrong_pkts = 0
     for pkt in pkts:
-        #frame_id = extract_field(pkt, 'frame_id')
-        time = extract_field(pkt, 'time_delta_displayed')
-        mid  = extract_field(pkt, 'coap.mid')
-        if mid not in mids.keys():
-            mids[mid] = []
-        mids[mid].append(float(time))
+        frame_id = extract_field(pkt, 'frame_id')
+        if 'coap' in  pkt["_source"]['layers']:
+
+            time = extract_field(pkt, 'time_delta_displayed')
+            mid  = extract_field(pkt, 'coap.mid')
+            if mid not in mids.keys():
+                mids[mid] = []
+            mids[mid].append(float(time))
+        else:
+            wrong_pkts += 1
+            logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
 
     con_time = []
     for mid, v in mids.items():
         con_time.append(sum(v) - v[0])
 
+    try:
+        t0 = float(extract_field( pkts[0], 'time_epoch'))
+        tf = float(extract_field( pkts[len(pkts)-1], 'time_epoch'))
+        e2e = tf - t0
+    except:
+        logger.error("Unable to read the packets")
+
+
     avarage = sum(con_time)/len(con_time)
     logger.info ("Avarage time: %f" % avarage)
-    pdr = (len(pkts) - NUM_TEST)/NUM_TEST * 100
-    return (avarage, pdr)
+    n_cons = len(pkts) - wrong_pkts
+    expeted_cons = NUM_TEST *2 # with ACK
+    pdr = (n_cons - expeted_cons)/expeted_cons * 100
+    return (avarage, pdr, e2e)
 

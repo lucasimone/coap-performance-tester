@@ -1,4 +1,5 @@
 import errno
+import time
 from tester import *
 from tester.commands import *
 
@@ -15,6 +16,10 @@ def start_coap_client(to=1000, arf=1.1, ret=1):
 
 
 if __name__ == '__main__':
+
+
+    if os.path.exists(DATADIR):
+        os.rename(DATADIR, ('_').join([DATADIR, str(time.time())]))
 
     # generate dirs
     for d in TMPDIR, DATADIR, LOGDIR:
@@ -48,12 +53,12 @@ if __name__ == '__main__':
                 start_coap_client(to=timeout_variance, arf=rand_factor_variance*ARF_STEP, ret=retry_variance)
                 stop_sniffer()
                 decode_json(file_name)
-                avg_time, pdr = computeTime('%s.json'%file_id)
+                avg_time, pdr, e2e = computeTime('%s.json'%file_id)
                 with open(TEST_RESULT, "a") as fw:
                     fw.writelines(
-                        "TEST.{0} TO:{1} ARF:{2} RT:{3} ITERATION:{4} AVG_TIME:{5} PDR:{6}\n"
+                        "TEST.{0} TO:{1} ARF:{2} RT:{3} ITERATION:{4} AVG_TIME:{5} PDR:{6} E2E:{7}\n"
                             .format(index, timeout_variance, rand_factor_variance * ARF_STEP,
-                            retry_variance, NUM_TEST, avg_time, pdr))
+                            retry_variance, NUM_TEST, avg_time, pdr, e2e))
                     fw.close()
 
                 index+=1
