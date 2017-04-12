@@ -1,7 +1,7 @@
 import errno
 from tester import *
 from tester.commands import *
-import time
+
 
 def start_coap_client(to=1000, arf=1.1, ret=1):
     global logger
@@ -23,6 +23,11 @@ if __name__ == '__main__':
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+
+
+
+
+
 
     logger.debug("START TEST...")
     index = 0
