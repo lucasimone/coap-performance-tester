@@ -25,4 +25,6 @@ LOGDIR = "log"
 URL = "coap://localhost"
 
 NUM_TEST = 1
-TEST_RESULT= "data/report.txt"
+
+TEST_RESULT = "data/report.txt"
+GRAPH_RESULT = "data/e2e.dat"

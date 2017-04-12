@@ -29,10 +29,20 @@ if __name__ == '__main__':
             if e.errno != errno.EEXIST:
                 raise
 
-
-
-
-
+    with open(GRAPH_RESULT, "a") as fw:
+        line = []
+        line.append("#TEST")
+        line.append("TO")
+        line.append("ARF")
+        line.append("RT")
+        line.append("N.GET")
+        line.append("AVG_TIME")
+        line.append("PDrop")
+        line.append("E2E")
+        line.append("P_SUCCESS")
+        line.append("\t")
+        fw.writelines(" ".join(line))
+        fw.close()
 
     logger.debug("START TEST...")
     index = 0
@@ -62,11 +72,28 @@ if __name__ == '__main__':
                     line.append("RT:{0}".format(retry_variance))
                     line.append("ITERATION:{0}".format(NUM_TEST))
                     line.append("AVG_TIME:{0}".format(avg_time))
-                    line.append("PDR:{0}".format(pdr))
+                    line.append("PDrop:{0}".format(pdr))
                     line.append("E2E:{0}".format(e2e))
                     line.append("P_SUCCESS:{0}".format(p_success))
                     line.append("\n")
                     fw.writelines(" ".join(line))
                     fw.close()
+
+                ## Create a file for plot the info
+                with open(GRAPH_RESULT, "a") as fw:
+                    line = []
+                    line.append("{0}".format(index))
+                    line.append("{0}".format(timeout_variance))
+                    line.append("{0}".format(rand_factor_variance* ARF_STEP))
+                    line.append("{0}".format(retry_variance))
+                    line.append("{0}".format(NUM_TEST))
+                    line.append("{0}".format(avg_time))
+                    line.append("{0}".format(pdr))
+                    line.append("{0}".format(e2e))
+                    line.append("{0}".format(p_success))
+                    line.append("\n")
+                    fw.writelines("\t".join(line))
+                    fw.close()
+
                 index += 1
     logger.debug("TEST is over!")

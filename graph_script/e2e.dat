@@ -1,0 +1,10 @@
+# This file is called   e2E.dat
+# E2E in function of different values of PDR and number of retransmissions
+      
+      # PDR      	R=4		R=5		R=6
+     0.2		2		1.96		1.78						   	
+     0.5		1.7    		1.6		1.45
+     0.7		1.6574  	1.3073		1.2525
+     0.8		0.3621   	0.3621		0.53411
+     0.9          	0.1106		0.0803		0.1267
+    
