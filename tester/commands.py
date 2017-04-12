@@ -137,15 +137,15 @@ def computeTime(json_file) -> (float, int):
     for pkt in pkts:
         frame_id = extract_field(pkt, 'frame_id')
         if 'coap' in  pkt["_source"]['layers']:
-            con_type  = int(extract_field(pkt, 'coap.type'))
+            coap_type  = int(extract_field(pkt, 'coap.type'))
             time = extract_field(pkt, 'time_delta_displayed')
             mid  = extract_field(pkt, 'coap.mid')
             if mid not in mids.keys():
                 mids[mid] = []
             mids[mid].append(float(time))
 
-            if con_type == 2 :
-               con_type += 1
+            if coap_type == 2 :
+                count_ack += 1
         else:
             wrong_pkts += 1
             logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
@@ -161,7 +161,7 @@ def computeTime(json_file) -> (float, int):
     except:
         logger.error("Unable to read the packets")
 
-    p_success = (con_type/NUM_TEST) * 100
+    p_success = (count_ack/NUM_TEST) * 100
     avarage = sum(con_time)/len(con_time)
     logger.info ("Avarage time: %f" % avarage)
     n_cons = len(pkts) - wrong_pkts
