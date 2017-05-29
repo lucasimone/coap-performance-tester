@@ -22,9 +22,9 @@ DATADIR = "data"
 LOGDIR = "log"
 
 
-URL = "coap://localhost"
+URL = "coap://localhost;5683/res1024"
 
-NUM_TEST = 1
+NUM_TEST = 5
 
 TEST_RESULT = "data/report.txt"
 GRAPH_RESULT = "data/e2e.dat"
