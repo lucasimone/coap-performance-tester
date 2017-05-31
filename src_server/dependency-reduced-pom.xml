@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>lu.secanlan.coap_plugtest_server</groupId>
-  <artifactId>corrupted_iut</artifactId>
-  <name>corrupted_IUT</name>
+  <artifactId>coap_server</artifactId>
+  <name>coap_server</name>
   <version>1.0-SNAPSHOT</version>
   <description>F-INTEROP IUT corrupted IUT that sends privacy information when queried on privacy resource</description>
   <build>

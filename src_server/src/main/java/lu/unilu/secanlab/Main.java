@@ -24,6 +24,7 @@ import lu.unilu.secanlab.resources.res_256;
 import lu.unilu.secanlab.resources.res_32;
 import lu.unilu.secanlab.resources.res_512;
 import lu.unilu.secanlab.resources.res_64;
+import lu.unilu.secanlab.resources.res_1000;
 
 public class Main {
 
@@ -43,6 +44,7 @@ public class Main {
             server.add(new Privacy());
             server.add(new res_1280());
             server.add(new res_1024());
+            server.add(new res_1000());
             server.add(new res_512());
             server.add(new res_256());
             server.add(new res_128());
