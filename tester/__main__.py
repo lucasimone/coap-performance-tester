@@ -2,24 +2,52 @@ import errno
 import time
 from tester import *
 from tester.commands import *
+from tester.wtite_output import *
+
+logger = logging.getLogger(__name__)
 
 
-def start_coap_client(to=1000, arf=1.1, ret=1):
-    global logger
+def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
+
     logger.debug("Start CoAP with Timeout={0}, ACK_RAND_FACTOR ={1}, RETRANSMISSION = {2}, N. GET: {3}"
                  .format(to, float(arf), ret, NUM_TEST))
 
+    url = "%s/%s" % (COAP_SERVER, resource)
     params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -f {3} {4} '\
-             .format(ret, NUM_TEST, to, arf, URL)
+             .format(ret, NUM_TEST, to, arf, url)
     os.system(params)
 
+
+def execute_con_requests(i, timeout, rand_fact, retry, res):
+    """
+    FIXED those parameters the COAP Client is called to send NUM_TEST CON to COAP_SERVER.
+    :param timeout:
+    :param rand_fact:
+    :param retry:
+    :param res: this is the resource to query on the CoAP Server
+    :return: ---
+    """
+    file_id = ('_'.join([FILENAME,
+                         "to",
+                         str(timeout),
+                         "arf",
+                         str(rand_fact),
+                         "r",
+                         str(retry),
+                         str(res)
+                         ]))
+    file_name = '%s.pcap' % file_id
+    launch_sniffer(file_name, IFC, other_filter='udp port 5683')
+    start_coap_client(to=timeout, arf=rand_fact * ARF_STEP, ret=retry, resource=res)
+    stop_sniffer()
+    decode_json(file_name)
+    write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
 
 
 if __name__ == '__main__':
 
-
     if os.path.exists(DATADIR):
-        os.rename(DATADIR, ('_').join([DATADIR, str(time.time())]))
+        os.rename(DATADIR, '_'.join([DATADIR, str(time.time())]))
 
     # generate dirs
     for d in TMPDIR, DATADIR, LOGDIR:
@@ -29,71 +57,21 @@ if __name__ == '__main__':
             if e.errno != errno.EEXIST:
                 raise
 
-    with open(GRAPH_RESULT, "a") as fw:
-        line = []
-        line.append("#TEST")
-        line.append("TO")
-        line.append("ARF")
-        line.append("RT")
-        line.append("N.GET")
-        line.append("AVG_TIME")
-        line.append("PDrop")
-        line.append("E2E")
-        line.append("P_SUCCESS")
-        line.append("\t")
-        fw.writelines(" ".join(line))
-        fw.close()
+    init_output_file()  # INIT FILE
 
-    logger.debug("START TEST...")
+    logger.debug("#####  START TEST  #######")
     index = 0
-    for timeout_variance in range(TIMEOUT_MIN, TIMEOUT_MAX, TIMEOUT_STEP):
-        for rand_factor_variance in range(ARF_MIN, ARF_MAX):
-            for retry_variance in range(RETRY_MIN, RETRY_MAX):
-
-                file_id = ('_'.join([FILENAME,
-                                    "to",
-                                    str(timeout_variance),
-                                    "arf",
-                                    str(rand_factor_variance),
-                                    "r",
-                                    str(retry_variance),
-                                    ]))
-                file_name = '%s.pcap' % file_id
-                launch_sniffer(file_name, IFC, other_filter='udp port 5683')
-                start_coap_client(to=timeout_variance, arf=rand_factor_variance*ARF_STEP, ret=retry_variance)
-                stop_sniffer()
-                decode_json(file_name)
-                avg_time, pdr, e2e, p_success= computeTime('%s.json'%file_id)
-                with open(TEST_RESULT, "a") as fw:
-                    line = []
-                    line.append("TEST.{0}".format(index))
-                    line.append("TO:{0}".format(timeout_variance))
-                    line.append("ARF:{0}".format(rand_factor_variance* ARF_STEP))
-                    line.append("RT:{0}".format(retry_variance))
-                    line.append("ITERATION:{0}".format(NUM_TEST))
-                    line.append("AVG_TIME:{0}".format(avg_time))
-                    line.append("PDrop:{0}".format(pdr))
-                    line.append("E2E:{0}".format(e2e))
-                    line.append("P_SUCCESS:{0}".format(p_success))
-                    line.append("\n")
-                    fw.writelines(" ".join(line))
-                    fw.close()
-
-                ## Create a file for plot the info
-                with open(GRAPH_RESULT, "a") as fw:
-                    line = []
-                    line.append("{0}".format(index))
-                    line.append("{0}".format(timeout_variance))
-                    line.append("{0}".format(rand_factor_variance* ARF_STEP))
-                    line.append("{0}".format(retry_variance))
-                    line.append("{0}".format(NUM_TEST))
-                    line.append("{0}".format(avg_time))
-                    line.append("{0}".format(pdr))
-                    line.append("{0}".format(e2e))
-                    line.append("{0}".format(p_success))
-                    line.append("\n")
-                    fw.writelines("\t".join(line))
-                    fw.close()
+    rand_factor_variance = ARF_MIN
+    for res in RES_LIST:
+        for timeout_variance in range(TIMEOUT_MIN, TIMEOUT_MAX+TIMEOUT_STEP, TIMEOUT_STEP):
+            for retry_variance in range(RETRY_MIN, RETRY_MAX+1):
+                execute_con_requests(index,
+                                     timeout=timeout_variance,
+                                     rand_fact=rand_factor_variance,
+                                     retry=retry_variance,
+                                     res=res)
 
                 index += 1
-    logger.debug("TEST is over!")
+            rand_factor_variance += (ARF_STEP*10)
+
+    logger.debug(">>>>>> TES IS OVER <<<<<<<<")

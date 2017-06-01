@@ -22,7 +22,9 @@ DATADIR = "data"
 LOGDIR = "log"
 
 
-URL = "coap://localhost;5683/res1024"
+COAP_SERVER = "coap://localhost:5683"
+RES_LIST = ["res128", "res256", "res512", "res1024"]
+DEF_RES = "res1024"
 
 NUM_TEST = 5
 

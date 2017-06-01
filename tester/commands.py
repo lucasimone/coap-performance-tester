@@ -6,14 +6,33 @@ import subprocess
 import logging
 import json
 
-from tester import NUM_TEST
+from tester import NUM_TEST, GRAPH_RESULT
 
 # init logging to stnd output and log files
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 logger.addHandler(sh)
 logger.propagate = True
+
+
+def init_output_file():
+
+    with open(GRAPH_RESULT, "a") as fw:
+        line = []
+        line.append("#TEST")
+        line.append("RESOURCE")
+        line.append("TO")
+        line.append("ARF")
+        line.append("RT")
+        line.append("N.GET")
+        line.append("AVG_TIME")
+        line.append("PDrop")
+        line.append("E2E")
+        line.append("P_SUCCESS")
+        line.append("\t")
+        fw.writelines(" ".join(line))
+        fw.close()
 
 
 def launch_sniffer(filename, filter_if, other_filter=None):
