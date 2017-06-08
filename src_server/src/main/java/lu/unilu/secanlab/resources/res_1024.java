@@ -48,7 +48,7 @@ public class res_1024 extends CoapResource {
 		builder.append("|               [each line contains 64 bytes]                 |\n");
 		builder.append("\\-------------------------------------------------------------/\n");
 		builder.append("/-------------------------------------------------------------\\\n");
-		builder.append("|                 RESOURCE BLOCK NO. 3 OF                    |\n");
+		builder.append("|                 RESOURCE BLOCK NO. 3 OF                     |\n");
 		builder.append("|               [each line contains 64 bytes]                 |\n");
 		builder.append("\\-------------------------------------------------------------/\n");
 		builder.append("/-------------------------------------------------------------\\\n");

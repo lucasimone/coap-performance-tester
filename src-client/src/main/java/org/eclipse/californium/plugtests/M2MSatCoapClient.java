@@ -94,23 +94,13 @@ public class M2MSatCoapClient {
 			}
 			
 			
-//			System.out.println("Usage: " + M2MSatCoapClient.class.getSimpleName() + " [-r -f -t] URI");
-//			System.out.println("  -r        : Number of retransmission after TIMEOUT [default="+NetworkConfig.getStandard().getInt(NetworkConfig.Keys.MAX_RETRANSMIT)+"]");
-//			System.out.println("  -t        : ACK timeout [default="+NetworkConfig.getStandard().getInt(NetworkConfig.Keys.ACK_TIMEOUT) +"]");
-//			System.out.println("  -f        : ACK RANDOM FACTOR [default="+NetworkConfig.getStandard().getFloat(NetworkConfig.Keys.ACK_RANDOM_FACTOR) +"]");
-//			System.out.println("  -N        : Number of GET request to sent consecutively");
-//			System.out.println("  URI       : The CoAP URI of the Plugtest server to test (coap://...)");
-//			System.out.println();
-//			System.out.println("\n All parameters are present in the Californium.properties file");
-//			
-//			System.exit(-1);
 		}
 	
 		
 		// Config used for plugtest
 		NetworkConfig.getStandard()
-			.setInt(NetworkConfig.Keys.MAX_MESSAGE_SIZE, 64)
-			.setInt(NetworkConfig.Keys.PREFERRED_BLOCK_SIZE, 64);
+			.setInt(NetworkConfig.Keys.MAX_MESSAGE_SIZE, 1280)
+			.setInt(NetworkConfig.Keys.PREFERRED_BLOCK_SIZE, 1280);
 		String flag = "";
 		
 		
@@ -211,7 +201,8 @@ public class M2MSatCoapClient {
 		try{
 			
 				  	CoapClient client = new CoapClient(uri);
-					response =  client.get();
+				  	client.useEarlyNegotiation(1280);
+				    response =  client.get();
 					if (response!=null) {
 						success ++;			 
 						System.out.println("     |--- Response code:" +response.getCode());

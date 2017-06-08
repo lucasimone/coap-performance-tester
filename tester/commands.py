@@ -181,10 +181,13 @@ def computeTime(json_file) -> (float, int):
         logger.error("Unable to read the packets")
 
     p_success = (count_ack/NUM_TEST) * 100
-    avarage = sum(con_time)/len(con_time)
-    logger.info ("Avarage time: %f" % avarage)
+    if len(con_time) > 0:
+        average = sum(con_time)/len(con_time)
+    else:
+        average = 0
+    logger.info ("Avarage time: %f" % average)
     n_cons = len(pkts) - wrong_pkts
     expeted_cons = NUM_TEST *2 # with ACK
     pdr = (n_cons - expeted_cons)/expeted_cons * 100
-    return (avarage, pdr, e2e, p_success)
+    return (average, pdr, e2e, p_success)
 
