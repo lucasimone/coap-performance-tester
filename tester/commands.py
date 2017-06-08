@@ -172,7 +172,7 @@ def computeTime(json_file) -> (float, int):
     con_time = []
     for mid, v in mids.items():
         con_time.append(sum(v) - v[0])
-
+    e2e = 0
     try:
         t0 = float(extract_field( pkts[0], 'time_epoch'))
         tf = float(extract_field( pkts[len(pkts)-1], 'time_epoch'))

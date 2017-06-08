@@ -61,8 +61,9 @@ if __name__ == '__main__':
 
     logger.debug("#####  START TEST  #######")
     index = 0
-    rand_factor_variance = ARF_MIN
+
     for res in RES_LIST:
+        rand_factor_variance = ARF_MIN
         for timeout_variance in range(TIMEOUT_MIN, TIMEOUT_MAX+TIMEOUT_STEP, TIMEOUT_STEP):
             for retry_variance in range(RETRY_MIN, RETRY_MAX+1):
                 execute_con_requests(index,
