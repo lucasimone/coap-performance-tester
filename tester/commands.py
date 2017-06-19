@@ -195,7 +195,7 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
     # n_cons = len(pkts) - wrong_pkts
     # expeted_cons = ntest *2 # with ACK
     # pdr = (n_cons - expeted_cons)/expeted_cons * 100
-
+    logger.info("TOTAL SIZE: %d" % total_size)
     pdr = ack_size*1.0 / total_size
     # logger.debug("ACK_SIZE: %d / ACK_TOTAL %d = %f" %(ack_size, total_size, pdr))
     return (average, pdr, e2e, p_success)
