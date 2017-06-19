@@ -30,5 +30,6 @@ DEF_RES = "res1024"
 
 NUM_TEST = 2
 
-TEST_RESULT = "data/report.txt"
-GRAPH_RESULT = "data/e2e.dat"
+DATA_PATH   = "data"
+TEST_RESULT = "report.txt"
+GRAPH_RESULT = "e2e.dat"

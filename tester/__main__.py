@@ -2,7 +2,7 @@ import errno
 import time
 from tester import *
 from tester.commands import *
-from tester.wtite_output import *
+from tester.write_output import *
 
 logger = logging.getLogger(__name__)
 

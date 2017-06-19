@@ -145,16 +145,20 @@ def extract_field(pkt, what) -> str:
         raise Exception("Error while parsing json conversation")
 
 
-def computeTime(json_file) -> (float, int):
+def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
     with open(json_file) as file:
         pkts = json.load(file)
         file.close()
 
     count_ack = 0
+    ack_size  = 0
+    total_size= 0
     mids = dict()
     wrong_pkts = 0
     for pkt in pkts:
         frame_id = extract_field(pkt, 'frame_id')
+        size = int(extract_field(pkt, 'pkt_size'))
+        total_size  += size
         if 'coap' in  pkt["_source"]['layers']:
             coap_type  = int(extract_field(pkt, 'coap.type'))
             time = extract_field(pkt, 'time_delta_displayed')
@@ -165,6 +169,7 @@ def computeTime(json_file) -> (float, int):
 
             if coap_type == 2 :
                 count_ack += 1
+                ack_size += size
         else:
             wrong_pkts += 1
             logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
@@ -180,14 +185,18 @@ def computeTime(json_file) -> (float, int):
     except:
         logger.error("Unable to read the packets")
 
-    p_success = (count_ack/NUM_TEST) * 100
+    p_success = (count_ack/num_test) * 100
     if len(con_time) > 0:
         average = sum(con_time)/len(con_time)
     else:
         average = 0
+
     logger.info ("Avarage time: %f" % average)
-    n_cons = len(pkts) - wrong_pkts
-    expeted_cons = NUM_TEST *2 # with ACK
-    pdr = (n_cons - expeted_cons)/expeted_cons * 100
+    # n_cons = len(pkts) - wrong_pkts
+    # expeted_cons = ntest *2 # with ACK
+    # pdr = (n_cons - expeted_cons)/expeted_cons * 100
+
+    pdr = ack_size*1.0 / total_size
+    # logger.debug("ACK_SIZE: %d / ACK_TOTAL %d = %f" %(ack_size, total_size, pdr))
     return (average, pdr, e2e, p_success)
 
