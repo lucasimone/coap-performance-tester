@@ -16,6 +16,8 @@ def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
     params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -f {3} {4} '\
              .format(ret, NUM_TEST, to, arf, url)
     os.system(params)
+    logger.debug(params)
+    time.sleep(1)
 
 
 def execute_con_requests(i, timeout, rand_fact, retry, res):
@@ -42,6 +44,7 @@ def execute_con_requests(i, timeout, rand_fact, retry, res):
     stop_sniffer()
     decode_json(file_name)
     write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
+
 
 
 if __name__ == '__main__':

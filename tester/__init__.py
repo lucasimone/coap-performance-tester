@@ -2,11 +2,11 @@ _last_capture = None
 
 
 TIMEOUT_MIN = 1000
-TIMEOUT_MAX = 1080
+TIMEOUT_MAX = 1000
 TIMEOUT_STEP = 10
 
 ARF_MIN  = 15
-ARF_MAX  = 18
+ARF_MAX  = 15
 ARF_STEP = .1
 
 RETRY_MIN = 1
@@ -25,8 +25,8 @@ LOGDIR = "log"
 COAP_SERVER = "coap://localhost:5683"
 #RES_LIST = ["res128", "res256", "res512", "res1024"]
 
-RES_LIST = ["res1024"]
-DEF_RES = "res1024"
+RES_LIST = ["res1152"]
+DEF_RES  = "res1152"
 
 NUM_TEST = 2
 

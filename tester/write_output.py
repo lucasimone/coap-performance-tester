@@ -1,12 +1,15 @@
+import datetime
 from tester import GRAPH_RESULT, TEST_RESULT, ARF_STEP, NUM_TEST, DATA_PATH
 from tester.commands import computeTime
 
-def init_output_file(path = DATA_PATH, num_test=NUM_TEST):
 
+def init_output_file(path = DATA_PATH, num_test=NUM_TEST):
+    dt = str(datetime.datetime.now())
     filename = "/".join([".", path, TEST_RESULT])
     with open(filename, "a") as fw:
         line = []
-        line.append ( "COMPUTE PATH:%s with %d tests " %(path, num_test))
+        line.append("COMPUTE PATH:%s with %d tests\n" %(path, num_test))
+        line.append("Created: %s\n" % dt)
         line.append("\n\n")
         fw.writelines(" ".join(line))
         fw.close()
@@ -17,6 +20,7 @@ def write_test_result(index, res, timeout, rand_factor, retry, file_id, path=DAT
     filename = "/".join([".", path, TEST_RESULT])
     avg_time, pdr, e2e, p_success = computeTime('%s.json' % file_id, num_test=num_test)
 
+    print(avg_time, pdr, e2e, p_success)
     with open(filename, "a") as fw:
         line = []
         line.append("\n")

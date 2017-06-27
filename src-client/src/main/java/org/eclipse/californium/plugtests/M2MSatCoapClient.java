@@ -107,8 +107,7 @@ public class M2MSatCoapClient {
 		
 		try{
 		    for (String arg: args){
-		    	
-//		    	System.out.println("Check arg: "+arg);
+
 		    	if (arg.startsWith("coap://")){
 		    		string_uri = arg;
 		    	}
@@ -162,9 +161,7 @@ public class M2MSatCoapClient {
 		System.out.println("NUM REQUEST = " + repeat);
 		System.out.println("===============  READY =====================");
 		
-		
-//		String tcpDumpCmd = "/usr/sbin/tcpdump -c 2 -v -A d";
-//		String tcpDumpResult = TcpDump.runTCPDump(tcpDumpCmd, true);
+
 		
 		for (int i= 0; i<repeat; i++){
 			System.out.println("[ CON ] SEND GET n."+(i+1));
@@ -175,11 +172,8 @@ public class M2MSatCoapClient {
 		System.out.println("\n\n");
 		System.out.println("===============  RESULT REPORT=============");
 		System.out.println(" SINGLE GET SENT = " + repeat);
-//		System.out.println(" TOTAL  CON SENT = " + overhead +" (with retransmission)");
 		System.out.println(" CON SUCCESS     = " + success);
 		System.out.println(" CON FAILED      = " + failed);
-//		System.out.println(" OVERHEAD        = " + (overhead - repeat));
-//		System.out.println(" Packet drops    = " + ((overhead - repeat)/repeat)*100 + "%");
 		System.out.println("===============  DONE =====================");
 		System.exit(0);
 	}

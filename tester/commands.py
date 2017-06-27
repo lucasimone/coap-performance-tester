@@ -126,6 +126,9 @@ def extract_field(pkt, what) -> str:
             return pkt["_source"]['layers']['frame']['frame.protocols']
         elif what == 'payload':
             return extract_payload(pkt)
+        elif what == 'coap_payload_size':
+            #print(">>>> " + pkt["_source"]['layers']['coap']['coap.payload'])
+            return pkt["_source"]['layers']['coap']['coap.payload'].split(",")[1].split(":")[1]
         elif what == 'timestamp':
             return pkt["_source"]['layers']['frame']['frame.time']
         elif what == 'src':
@@ -136,6 +139,8 @@ def extract_field(pkt, what) -> str:
             return pkt["_source"]['layers']['ipv6']['ipv6.addr']
         elif what == 'coap.mid':
             return pkt["_source"]['layers']['coap']['coap.mid']
+        elif what == 'coap.res':
+            return pkt["_source"]['layers']['coap']['coap.opt.uri_path']
         elif what == 'coap.type':
             return pkt["_source"]['layers']['coap']['coap.type']
         else:
@@ -169,7 +174,8 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
 
             if coap_type == 2 :
                 count_ack += 1
-                ack_size += size
+                #ack_size += size
+                ack_size += int(extract_field(pkt, 'coap_payload_size'))
         else:
             wrong_pkts += 1
             logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
@@ -185,7 +191,12 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
     except:
         logger.error("Unable to read the packets")
 
+
     p_success = (count_ack/num_test) * 100
+    res = json_file.split('_')[7].replace(".json", "")
+    if res in ["res1152", "res1280"]:
+        p_success /= 2  ### PERCHE FRAMMENTO in DUE PACCHETTI
+
     if len(con_time) > 0:
         average = sum(con_time)/len(con_time)
     else:
