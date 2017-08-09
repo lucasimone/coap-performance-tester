@@ -12,6 +12,7 @@ ARF_STEP = .1
 RETRY_MIN = 1
 RETRY_MAX = 1
 
+BLOCK_SIZE = 512
 
 IFC = "lo0"
 FILENAME = "data/capture"
@@ -25,8 +26,8 @@ LOGDIR = "log"
 COAP_SERVER = "coap://localhost:5683"
 #RES_LIST = ["res128", "res256", "res512", "res1024"]
 
-RES_LIST = ["res1152"]
-DEF_RES  = "res1152"
+RES_LIST = ["res1280"]
+DEF_RES  = "res1280"
 
 NUM_TEST = 2
 

@@ -34,6 +34,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<!-- inherit configuration from parent POM -->
 			</plugin>
+
 		</plugins>
 	</build>
 

@@ -13,8 +13,8 @@ def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
                  .format(to, float(arf), ret, NUM_TEST))
 
     url = "%s/%s" % (COAP_SERVER, resource)
-    params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -f {3} {4} '\
-             .format(ret, NUM_TEST, to, arf, url)
+    params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -b {3} -f {4} {5} '\
+             .format(ret, NUM_TEST, to, BLOCK_SIZE, -arf, url)
     os.system(params)
     logger.debug(params)
     time.sleep(1)

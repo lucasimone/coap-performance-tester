@@ -43,7 +43,7 @@ public class M2MSatCoapClient {
 
 	private static int val;
 	private static String string_uri  = "coap://localhost";;
-
+	private static int blockSize = 1280;
 	
 	public static void main(String[] args) {
 		
@@ -127,6 +127,9 @@ public class M2MSatCoapClient {
 		    	else if (flag.toLowerCase().equals("-f")){
 		    		NetworkConfig.getStandard().setFloat(NetworkConfig.Keys.ACK_RANDOM_FACTOR, Float.parseFloat(arg));
 		    	}
+			else if (flag.toLowerCase().equals("-b")){
+				blockSize = Integer.parseInt(arg);
+			}
 		    	else System.err.println("Parameter "+arg+" is not valid");	   
 		    }
 	    }catch(Exception ex){
@@ -150,8 +153,8 @@ public class M2MSatCoapClient {
 		
 			
 	    System.out.println("=============== PARAMS =====================");
-		System.out.println(" - MAX_MESSAGE_SIZE = "+ NetworkConfig.getStandard().getInt(NetworkConfig.Keys.MAX_MESSAGE_SIZE));
-		System.out.println(" - PREFERRED_BLOCK_SIZE = "+ NetworkConfig.getStandard().getInt(NetworkConfig.Keys.PREFERRED_BLOCK_SIZE));
+		System.out.println(" - MAX_MESSAGE_SIZE = "+ blockSize);
+		//System.out.println(" - PREFERRED_BLOCK_SIZE = "+ NetworkConfig.getStandard().getInt(NetworkConfig.Keys.PREFERRED_BLOCK_SIZE));
 		System.out.println(" - ACK_TIMEOUT = "+ NetworkConfig.getStandard().getInt(NetworkConfig.Keys.ACK_TIMEOUT));
 		System.out.println(" - ACK_RANDOM_FACTOR = "+ NetworkConfig.getStandard().getFloat(NetworkConfig.Keys.ACK_RANDOM_FACTOR));
 		System.out.println(" - RETRANSMISSION = "+ NetworkConfig.getStandard().getInt(NetworkConfig.Keys.MAX_RETRANSMIT));
@@ -194,10 +197,11 @@ public class M2MSatCoapClient {
 		CoapResponse response = null;
 		try{
 			
-				  	CoapClient client = new CoapClient(uri);
-				  	client.useEarlyNegotiation(1280);
-				    response =  client.get();
-					if (response!=null) {
+			CoapClient client = new CoapClient(uri);
+			client.useEarlyNegotiation(blockSize);
+			System.out.println("Set Early Negotiation to " + blockSize);
+			response =  client.get();
+			if (response!=null) {
 						success ++;			 
 						System.out.println("     |--- Response code:" +response.getCode());
 						System.out.println("     |--- Response options:" + response.getOptions());
@@ -206,12 +210,12 @@ public class M2MSatCoapClient {
 						System.out.println("     |--- ADVANCED:\n");
 						// access advanced API with access to more details through .advanced()
 						System.out.println(Utils.prettyPrint(response));
-					}
-					else{
+			}
+			else {
 						failed++;
 						System.out.println("     |--- No response received.");
 						
-					}
+			}
 		}catch(Exception ex){
 			System.out.println("Something went wrong :(");
 			ex.printStackTrace();
