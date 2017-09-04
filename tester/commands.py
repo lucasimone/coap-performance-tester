@@ -139,6 +139,8 @@ def extract_field(pkt, what) -> str:
             return pkt["_source"]['layers']['ipv6']['ipv6.addr']
         elif what == 'coap.mid':
             return pkt["_source"]['layers']['coap']['coap.mid']
+        elif what == 'coap.token':
+            return pkt["_source"]['layers']['coap']['coap.token']
         elif what == 'coap.res':
             return pkt["_source"]['layers']['coap']['coap.opt.uri_path']
         elif what == 'coap.type':
@@ -159,7 +161,10 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
     ack_size  = 0
     total_size= 0
     mids = dict()
+    tokens = dict()
     wrong_pkts = 0
+
+
     for pkt in pkts:
         frame_id = extract_field(pkt, 'frame_id')
         size = int(extract_field(pkt, 'pkt_size'))
@@ -167,12 +172,19 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
         if 'coap' in  pkt["_source"]['layers']:
             coap_type  = int(extract_field(pkt, 'coap.type'))
             time = extract_field(pkt, 'time_delta_displayed')
-            mid  = extract_field(pkt, 'coap.mid')
+            mid = extract_field(pkt, 'coap.mid')
+            token = extract_field(pkt, 'coap.token')
+
+            # Each Fragmented resource has the same token
+            if token not in tokens.keys():
+                tokens[token] = []
+            tokens.append(mid)
+
             if mid not in mids.keys():
                 mids[mid] = []
             mids[mid].append(float(time))
 
-            if coap_type == 2 :
+            if coap_type == 2:  # Message_type 2 is ACK
                 count_ack += 1
                 #ack_size += size
                 ack_size += int(extract_field(pkt, 'coap_payload_size'))

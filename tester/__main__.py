@@ -46,7 +46,6 @@ def execute_con_requests(i, timeout, rand_fact, retry, res):
     write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
 
 
-
 if __name__ == '__main__':
 
     if os.path.exists(DATADIR):
