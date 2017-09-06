@@ -18,9 +18,9 @@ def init_output_file(path = DATA_PATH, num_test=NUM_TEST):
 def write_test_result(index, res, timeout, rand_factor, retry, file_id, path=DATA_PATH, num_test=NUM_TEST):
 
     filename = "/".join([".", path, TEST_RESULT])
-    avg_time, pdr, e2e, p_success = computeTime('%s.json' % file_id, num_test=num_test)
+    avg_time, efficency, e2e, pdr, success, fail = computeTime('%s.json' % file_id, num_test=num_test)
 
-    print(avg_time, pdr, e2e, p_success)
+    #print(avg_time, efficency, e2e, pdr)
     with open(filename, "a") as fw:
         line = []
         line.append("\n")
@@ -32,9 +32,11 @@ def write_test_result(index, res, timeout, rand_factor, retry, file_id, path=DAT
         line.append("|- RT:{0}\n".format(retry))
         line.append("|- ITERATION:{0}\n".format(num_test))
         line.append("|- AVG_TIME:{0}\n".format(avg_time))
-        line.append("|- PDrop:{0}\n".format(pdr))
-        line.append("|- E2E:{0}\n".format(e2e))
-        line.append("|- Prob SUCCESS: {0}\n".format(p_success))
+        line.append("|- PDrop:{0}\n".format(efficency))
+        line.append("|- Prob SUCCESS: {0}\n".format(pdr))
+        line.append("|- PKT SENT: {0}\n".format(success))
+        line.append("|- PKT LOST: {0}\n".format(fail))
+        line.append("|- TOTAL PKTs : {0}\n".format(fail+success))
         line.append("\n")
         fw.writelines(" ".join(line))
         fw.close()

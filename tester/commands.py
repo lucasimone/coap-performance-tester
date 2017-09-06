@@ -157,69 +157,110 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
         pkts = json.load(file)
         file.close()
 
-    count_ack = 0
-    ack_size  = 0
-    total_size= 0
-    mids = dict()
-    tokens = dict()
-    wrong_pkts = 0
 
-
+    payload_size = 0
+    old_token = ""
+    old_mid = ""
+    wait_for_final_ack = False
+    coap_msg_lost = 0
+    coap_msg_success = 0
+    initial_time = 0
+    final_time = 0
+    e2e_full_payload = []
+    wrong_pkts  = 0
+    pkt_index   = 0
+    total_size  = 0
+    ack_size = 0
     for pkt in pkts:
+
         frame_id = extract_field(pkt, 'frame_id')
         size = int(extract_field(pkt, 'pkt_size'))
-        total_size  += size
+
         if 'coap' in  pkt["_source"]['layers']:
-            coap_type  = int(extract_field(pkt, 'coap.type'))
-            time = extract_field(pkt, 'time_delta_displayed')
+            pkt_index += 1
+            total_size += size  # TOTAL AMOUNT OF DATA TRANSMITTED IN A COAP COMMUNICATION
+            coap_type = int(extract_field(pkt, 'coap.type'))
             mid = extract_field(pkt, 'coap.mid')
             token = extract_field(pkt, 'coap.token')
+            epoch_time = float(extract_field(pkt, 'time_epoch'))
 
-            # Each Fragmented resource has the same token
-            if token not in tokens.keys():
-                tokens[token] = []
-            tokens.append(mid)
+            if coap_type == 0:  # CON MESSAGE
 
-            if mid not in mids.keys():
-                mids[mid] = []
-            mids[mid].append(float(time))
+                # CASE 1: RETRANSMISSION because the MID and TOKEN are the same
+                if token == old_token and mid == old_mid:
+                    logger.debug("-- Packet n. {2} Retransmission Mid:{0}, Token:{1} - TIME_MS:{3}".format(mid, token, pkt_index, epoch_time))
 
-            if coap_type == 2:  # Message_type 2 is ACK
-                count_ack += 1
-                #ack_size += size
-                ack_size += int(extract_field(pkt, 'coap_payload_size'))
+                # Case 2: PAYLOAD FRAGMENTATION: New MID but same TOKEN
+                elif token == old_token:
+                    logger.debug("-- Packet n. {2} Payload Fragmented MID:{0}, Token:{1}".format(mid, token, pkt_index))
+
+                # Case 3: New Conversation - New MID, new TOKEN
+                else:
+                    logger.debug("-------------------")
+                    # Case 3.1 - if we are waiting a ACK this means that we have lost the ACK
+                    if wait_for_final_ack:
+                        coap_msg_lost += 1
+                        final_time = epoch_time
+                        logger.debug("PACKET n. {0} didn't get ACK - Packet lost :(".format(pkt_index-1))
+                    # Case 3.2 - A new message and before everything was acknowledged.
+                    else:
+                        coap_msg_success += 1
+                        logger.debug("PACKET n. {0} get ACK - Packet SUCCESS !!! ".format(pkt_index-1))
+                        # Since is a successful delivery we add the amount of size at the total payload sent
+                        payload_size += ack_size
+
+                    e2e = final_time - initial_time     # TIME to SUCCESSFULLY (or NOT) TRANSFER a FULL PAYLOAD
+                    e2e_full_payload.append(e2e)
+                    logger.debug("PACKET n. {1} E2E Latency is {0}  [{2} - {3}]".format(e2e, pkt_index-1, final_time, initial_time))
+                    ack_size = 0
+                    initial_time = epoch_time  # START TIME
+                    logger.debug("-------------------")
+                    logger.debug("-- Packet n. {2} New Request    MID:{0}, Token:{1} - T_START:{3}"
+                                 .format(mid, token, pkt_index, initial_time))
+
+                # As a new CON we need to RESET each COUNTER
+                wait_for_final_ack = True   # we need to get another ACK for this CON
+                old_token = token
+                old_mid = mid
+
+            elif coap_type == 2:  # ACK MESSAGE
+
+                # MID and TOKEN should match the ACK otherwise there is a error on the flow
+                # since everything is sequential.
+                if token == old_token:
+                    final_time = epoch_time
+                    wait_for_final_ack = False
+                    ack_size += int(extract_field(pkt, 'coap_payload_size'))
+                else:
+                    logger.error("This situation is IMPOSSIBLE!")
+
+        # NOT a CoAP message - SKIP IT
         else:
             wrong_pkts += 1
             logger.debug("SKIP packet frame id {0} because it is not a coap message".format(frame_id))
 
-    con_time = []
-    for mid, v in mids.items():
-        con_time.append(sum(v) - v[0])
-    e2e = 0
-    try:
-        t0 = float(extract_field( pkts[0], 'time_epoch'))
-        tf = float(extract_field( pkts[len(pkts)-1], 'time_epoch'))
-        e2e = tf - t0
-    except:
-        logger.error("Unable to read the packets")
+    p_success = coap_msg_success / (coap_msg_lost+coap_msg_success) * 100
+    average = sum(e2e_full_payload) / (coap_msg_lost+coap_msg_success)
+
+    efficency = payload_size * 1.0 / total_size
+    logger.info(" #################################### ")
+    logger.info(" Summary RESULT")
+    logger.info(" #################################### ")
+    logger.info(" ")
+    logger.info(" N. of packets sent are     : {0}".format(coap_msg_lost+coap_msg_success))
+    logger.info(" N. of packets TRANSMITTED  : {0}".format(coap_msg_success))
+    logger.info(" N. of packets LOST         : {0}".format(coap_msg_lost))
+    logger.info(" Average Latency time (e2e) : {0}".format(average))
+    logger.info(" Total Data transmitted     : {0}".format(total_size))
+    logger.info(" Total Payload transmitted  : {0}".format(payload_size))
+    logger.info(" Efficiency (Payload/SIZE)  : {0}".format(efficency))
+    logger.info(" Success probability        : {0}".format(p_success))
+    logger.info(" OTHER PACKETS probability  : {0}".format(wrong_pkts))
+
+    return average, efficency, 0, p_success, coap_msg_success, coap_msg_lost
 
 
-    p_success = (count_ack/num_test) * 100
-    res = json_file.split('_')[7].replace(".json", "")
-    if res in ["res1152", "res1280"]:
-        p_success /= 2  ### PERCHE FRAMMENTO in DUE PACCHETTI
 
-    if len(con_time) > 0:
-        average = sum(con_time)/len(con_time)
-    else:
-        average = 0
 
-    logger.info ("Avarage time: %f" % average)
-    # n_cons = len(pkts) - wrong_pkts
-    # expeted_cons = ntest *2 # with ACK
-    # pdr = (n_cons - expeted_cons)/expeted_cons * 100
-    logger.info("TOTAL SIZE: %d" % total_size)
-    pdr = ack_size*1.0 / total_size
-    # logger.debug("ACK_SIZE: %d / ACK_TOTAL %d = %f" %(ack_size, total_size, pdr))
-    return (average, pdr, e2e, p_success)
-
+if __name__ == '__main__':
+    computeTime("../data/coap-tester-10.0_blocksize/70a/capture_to_1200_arf_12_r_4_res128.json", 500)
