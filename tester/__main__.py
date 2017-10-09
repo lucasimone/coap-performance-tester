@@ -42,8 +42,8 @@ def execute_con_requests(i, timeout, rand_fact, retry, res):
     launch_sniffer(file_name, IFC, other_filter='udp port 5683')
     start_coap_client(to=timeout, arf=rand_fact * ARF_STEP, ret=retry, resource=res)
     stop_sniffer()
-    decode_json(file_name)
-    write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
+    #decode_json(file_name)
+    #write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
 
 
 if __name__ == '__main__':

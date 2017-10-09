@@ -9,7 +9,7 @@ from tester.write_output import *
 ###### CAMBIA SOLO QUESTI VALORI!!!!!
 
 num_test = 500
-main_folder = "../data/coap-tester-10.0_blocksize"
+main_folder = "data/coap-tester-10.0_blocksize"
 #######################################
 
 
