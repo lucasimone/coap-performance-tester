@@ -1,15 +1,38 @@
 import glob
 import os
-import datetime
+import errno
+import logging
+from coap_performance_tester import DATADIR, LOGDIR, LOG_FORMAT, LOG_FILE
 
-from tester.write_output import *
+# init logging to stnd output and log files
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+sh = logging.StreamHandler()
+logger.addHandler(sh)
+logger.propagate = True
+
+# Configure Logger
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, format=LOG_FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter(LOG_FORMAT)
+
+# generate dirs
+for d in DATADIR, LOGDIR:
+    try:
+        os.makedirs(d)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+from coap_performance_tester.write_output import *
 #data_path = input("Please enter data path: ")
 
 
 ###### CAMBIA SOLO QUESTI VALORI!!!!!
 
 num_test = 500
-main_folder = "data/coap-tester-10.0_blocksize"
+main_folder = "data"
 #######################################
 
 
@@ -48,12 +71,14 @@ def generate_report(data_path):
 
 if __name__ == '__main__':
 
+
+    logger.info("Check in {}...".format(main_folder))
     for directory in glob.glob('%s/*/'% main_folder):
 
-        print ("- check dir: %s" % directory)
+        logger.info ("- check dir: %s" % directory)
         report_file = "%s/report.txt" % directory
         if os.path.exists(report_file) :
-            print("RENAME REPORT in %s" %directory)
+            logger.info("RENAME REPORT in %s" %directory)
             dt = str(datetime.datetime.now())
             rename_report = '%s/backup_report_' % (directory) + dt + '.txt'
             os.rename(report_file, rename_report)

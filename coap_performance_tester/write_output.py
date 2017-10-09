@@ -1,6 +1,6 @@
 import datetime
-from tester import GRAPH_RESULT, TEST_RESULT, ARF_STEP, NUM_TEST, DATA_PATH
-from tester.commands import computeTime
+from coap_performance_tester import GRAPH_RESULT, TEST_RESULT, ARF_STEP, NUM_TEST, DATA_PATH
+from coap_performance_tester.commands import computeTime
 
 
 def init_output_file(path = DATA_PATH, num_test=NUM_TEST):

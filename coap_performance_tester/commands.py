@@ -6,7 +6,9 @@ import subprocess
 import logging
 import json
 
-from tester import NUM_TEST, GRAPH_RESULT
+from coap_performance_tester import NUM_TEST, GRAPH_RESULT, LOG_FILE, LOG_FORMAT
+
+
 
 # init logging to stnd output and log files
 logger = logging.getLogger(__name__)
@@ -14,6 +16,15 @@ logger.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 logger.addHandler(sh)
 logger.propagate = True
+
+# Configure Logger
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG, format=LOG_FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter(LOG_FORMAT)
+
+
+
 
 
 def init_output_file():
@@ -263,4 +274,4 @@ def computeTime(json_file, num_test=NUM_TEST) -> (float, int):
 
 
 if __name__ == '__main__':
-    computeTime("../data/coap-tester-10.0_blocksize/70a/capture_to_1200_arf_12_r_4_res128.json", 500)
+    computeTime("../data/coap-coap_performance_tester-10.0_blocksize/70a/capture_to_1200_arf_12_r_4_res128.json", 500)

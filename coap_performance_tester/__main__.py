@@ -1,11 +1,11 @@
 import errno
 import time
-from tester import *
-from tester.commands import *
-from tester.write_output import *
+
+from coap_performance_tester import *
+from coap_performance_tester.commands import *
+from coap_performance_tester.write_output import *
 
 logger = logging.getLogger(__name__)
-
 
 def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
 
@@ -13,7 +13,7 @@ def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
                  .format(to, float(arf), ret, NUM_TEST))
 
     url = "%s/%s" % (COAP_SERVER, resource)
-    params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -b {3} -f {4} {5} '\
+    params = 'java  -jar ./coap_performance_tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -b {3} -f {4} {5} '\
              .format(ret, NUM_TEST, to, BLOCK_SIZE, -arf, url)
     os.system(params)
     logger.debug(params)
@@ -42,8 +42,11 @@ def execute_con_requests(i, timeout, rand_fact, retry, res):
     launch_sniffer(file_name, IFC, other_filter='udp port 5683')
     start_coap_client(to=timeout, arf=rand_fact * ARF_STEP, ret=retry, resource=res)
     stop_sniffer()
-    #decode_json(file_name)
-    #write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
+
+    # Remove comments to the next line if you want to have an immediate analysis of the pcap file.
+    #
+    # decode_json(file_name)
+    # write_test_result(i, res=res, timeout=timeout, rand_factor=rand_fact, retry=retry, file_id=file_id)
 
 
 if __name__ == '__main__':

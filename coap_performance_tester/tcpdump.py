@@ -1,9 +1,7 @@
-
-import errno
 import time
-from tester import *
-from tester.commands import *
-from tester.write_output import *
+from coap_performance_tester import *
+from coap_performance_tester.commands import *
+from coap_performance_tester.write_output import *
 
 def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
 
@@ -11,7 +9,7 @@ def start_coap_client(to=1000, arf=1.1, ret=1, resource=DEF_RES):
                  .format(to, float(arf), ret, NUM_TEST))
 
     url = "%s/%s" % (COAP_SERVER, resource)
-    params = 'java  -jar ./tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -f {3} {4} '\
+    params = 'java  -jar ./coap_performance_tester/lib/m2m-coap-client-1.jar -r {0} -n {1} -t {2} -f {3} {4} '\
              .format(ret, NUM_TEST, to, arf, url)
     os.system(params)
     logger.debug(params)

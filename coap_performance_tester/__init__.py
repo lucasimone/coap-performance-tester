@@ -16,7 +16,8 @@ BLOCK_SIZE = 512
 
 IFC = "lo0"
 FILENAME = "data/capture"
-
+LOG_FILE = "log/coap-performance-test.log"
+LOG_FORMAT   = '%(levelname)-7s | %(asctime)s | %(name)40s:%(lineno)-3d| %(message)s'
 
 TMPDIR = "tmp"
 DATADIR = "data"
